@@ -157,21 +157,23 @@ module Roar
 
           nested(:relationships, inherit: true) do
             nested(:"#{name}_relationship", as: MemberName.(name)) do
-              property name, options.merge(as:           :data,
-                                           getter:       ->(opts) {
-                                             object = opts[:binding].send(:exec_context, opts)
-                                             value  = object.public_send(opts[:binding].getter)
-                                             # do not blow up on nil collections
-                                             if options[:collection] && value.nil?
-                                               []
-                                             else
-                                               value
-                                             end
-                                           },
-                                           render_nil:   true,
-                                           render_empty: true,
-                                           decorator:    resource_identifier_representer,
-                                           wrap:         false)
+              if options[:data] == false
+                property name, options.merge(as:           :data,
+                                             getter:       ->(opts) {
+                                               object = opts[:binding].send(:exec_context, opts)
+                                               value  = object.public_send(opts[:binding].getter)
+                                               # do not blow up on nil collections
+                                               if options[:collection] && value.nil?
+                                                 []
+                                               else
+                                                 value
+                                               end
+                                             },
+                                             render_nil:   true,
+                                             render_empty: true,
+                                             decorator:    resource_identifier_representer,
+                                             wrap:         false)
+              end
 
               instance_exec(&resource_identifier_representer.relationship)
 
