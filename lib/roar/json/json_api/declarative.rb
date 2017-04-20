@@ -149,15 +149,17 @@ module Roar
             end
           end
 
-          nested(:included, inherit: true) do
-            property(name, collection: options[:collection],
-                           decorator:  resource_decorator,
-                           wrap:       false)
+          unless options[:included] == false
+            nested(:included, inherit: true) do
+              property(name, collection: options[:collection],
+                             decorator:  resource_decorator,
+                             wrap:       false)
+            end
           end
 
           nested(:relationships, inherit: true) do
             nested(:"#{name}_relationship", as: MemberName.(name)) do
-              if options[:data] == false
+              unless options[:data] == false
                 property name, options.merge(as:           :data,
                                              getter:       ->(opts) {
                                                object = opts[:binding].send(:exec_context, opts)
